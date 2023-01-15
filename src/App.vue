@@ -1,16 +1,52 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <CreateSection
+    :isDisabled="isDisabled"
+    v-model="sectionName"
+    @click="createSection"
+  />
+  <TaskSection :section="section" />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import TaskSection from './components/TaskSection.vue'
+import CreateSection from './components/CreateSection.vue'
+import { Sections, Section, Task } from '../domain/Task'
+
+const defaultSection = new Section('最初のセクションです')
+const defaultTask = new Task({
+  title: 'タイトルです',
+  content: '内容です',
+  sectionId: defaultSection.id
+})
+
+defaultSection.push(defaultTask)
+const sections = new Sections([defaultSection])
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
-  }
+    CreateSection,
+    TaskSection,
+  },
+  data() {
+    return {
+      sections: sections,
+      section: defaultSection,
+      sectionName: '',
+    }
+  },
+  computed: {
+    isDisabled() {
+      return this.sectionName === ''
+    },
+  },
+  methods: {
+    createSection() {
+      console.log(this.sectionName)
+      this.sections.push(new Section(this.sectionName))
+      this.sectionName = ''
+    },
+  },
 }
 </script>
 
