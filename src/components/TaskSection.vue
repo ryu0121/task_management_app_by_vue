@@ -5,6 +5,7 @@ import { Section } from '../../domain/Task'
 
 defineProps({
   section: Section,
+  displayOptions: Object,
   modelValue: String,
 })
 
@@ -15,7 +16,7 @@ const emit = defineEmits([
   'deleteTask',
   'doneTask',
   'returnTaskToActive',
-  'toEditing',
+  'toTaskEditing',
   'activateTask'
 ])
 
@@ -134,7 +135,7 @@ const isDisableCreateButton = (taskId) => {
       </div>
     </div>
   </div>
-  <div>
+  <div v-if="displayOptions.displayAll">
     <button @click="$emit('createTaskDraft')" class="btn btn-primary">+</button>
   </div>
 </template>

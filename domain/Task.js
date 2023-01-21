@@ -3,6 +3,21 @@ export class Sections {
     this.items = items
   }
 
+  copy() {
+    const copied = new Sections([])
+    for (const section of this.items) {
+      const copySection = new Section(section.name, section.id)
+
+      for (const task of section.tasks) {
+        const copyTask = task
+        copySection.push(copyTask)
+      }
+      copied.push(copySection)
+    }
+
+    return copied
+  }
+
   push(section) {
     return this.items.push(section)
   }
@@ -16,6 +31,22 @@ export class Sections {
     });
 
     return result
+  }
+
+  getSectionIndex(sectionId) {
+    let index;
+    this.items.forEach((section, i) => {
+      if (section.id === sectionId) {
+        index = i
+      }
+    });
+
+    return index
+  }
+
+  deleteSection(sectionId) {
+    const index = this.getSectionIndex(sectionId)
+    this.items.splice(index, 1)
   }
 
   insertTaskToSection(task, sectionId) {
@@ -61,8 +92,8 @@ export class Sections {
 }
 
 export class Section {
-  constructor(name = '') {
-    this.id = getUniqueStr()
+  constructor(name = '', id = '') {
+    this.id = id === '' ? getUniqueStr() : id
     this.tasks = []
     this.name = name
   }
@@ -108,6 +139,14 @@ export class Task {
     this.content = content
     this.status = TaskStatus.Draft
     this.sectionId = sectionId
+  }
+
+  copy() {
+    const newTask = new Task({ title: this.title, content: this.content, sectionId: this.sectionId })
+    newTask.id = this.id
+    newTask.status = this.status
+
+    return newTask
   }
 
   activate(payload) {

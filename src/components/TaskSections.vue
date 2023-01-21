@@ -1,22 +1,13 @@
 <script setup>
-import { defineEmits, defineProps, ref } from 'vue'
+import { defineProps } from 'vue'
 
 import { Sections } from '../../domain/Task'
 import TaskSection from './TaskSection.vue'
 
 defineProps({
-  sections: Sections
+  sections: Sections,
+  displayOptions: Object
 })
-const emit = defineEmits(['onChangeNewTaskTitle'])
-
-const newTaskTitle = ref('')
-const onChangeNewTaskTitle = (payload) => {
-  newTaskTitle.value = payload
-  childEmit()
-}
-const childEmit = () => {
-  emit('onChangeNewTaskTitle', newTaskTitle)
-}
 </script>
 
 <template>
@@ -24,7 +15,7 @@ const childEmit = () => {
     <div v-for="section in sections.items" :key="section.id" class="mx-3">
       <TaskSection
         :section="section"
-        @onChangeNewTaskTitle="onChangeNewTaskTitle"
+        :displayOptions="displayOptions"
         @createTaskDraft="$emit('createTaskDraft', section.id)"
         @completeCreateTask="$emit('completeCreateTask', $event, section.id)"
         @deleteTask="$emit('deleteTask', $event, section.id)"
