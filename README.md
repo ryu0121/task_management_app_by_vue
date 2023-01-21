@@ -35,3 +35,4 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ## Reference
 
 - https://zenn.dev/miyanokomiya/articles/76bc7b48fbc614
+- https://qiita.com/jay-es/items/8b3b2bf06eeefdc43a5a

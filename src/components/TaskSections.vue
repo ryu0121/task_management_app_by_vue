@@ -1,3 +1,24 @@
+<script setup>
+import { defineEmits, defineProps, ref } from 'vue'
+
+import { Sections } from '../../domain/Task'
+import TaskSection from './TaskSection.vue'
+
+defineProps({
+  sections: Sections
+})
+const emit = defineEmits(['onChangeNewTaskTitle'])
+
+const newTaskTitle = ref('')
+const onChangeNewTaskTitle = (payload) => {
+  newTaskTitle.value = payload
+  childEmit()
+}
+const childEmit = () => {
+  emit('onChangeNewTaskTitle', newTaskTitle)
+}
+</script>
+
 <template>
   <div class="d-flex justify-content-start mx-3">
     <div v-for="section in sections.items" :key="section.id" class="mx-3">
@@ -15,32 +36,3 @@
     </div>
   </div>
 </template>
-
-<script>
-import { Sections } from '../../domain/Task'
-import TaskSection from './TaskSection.vue'
-
-export default {
-  name: 'TaskSections',
-  components: {
-    TaskSection,
-  },
-  props: {
-    sections: Sections
-  },
-  data() {
-    return {
-      newTaskTitle: '',
-    }
-  },
-  methods: {
-    onChangeNewTaskTitle(payload) {
-      this.newTaskTitle = payload
-      this.childEmit()
-    },
-    childEmit() {
-      this.$emit('onChangeNewTaskTitle', this.newTaskTitle)
-    }
-  },
-}
-</script>
