@@ -1,3 +1,84 @@
+<script setup>
+import { defineEmits, defineProps, ref } from 'vue'
+
+import { Section } from '../../domain/Task'
+
+defineProps({
+  section: Section,
+  modelValue: String,
+})
+
+const emit = defineEmits([
+  'createTaskDraft',
+  'deleteTaskDraft',
+  'completeCreateTask',
+  'deleteTask',
+  'doneTask',
+  'returnTaskToActive',
+  'toEditing',
+  'activateTask'
+])
+
+const tmpTasks = ref({})
+
+const completeCreateTask = (taskId) => {
+  const title = tmpTasks.value[taskId].title
+  const content = tmpTasks.value[taskId].content
+  emit('completeCreateTask', { taskId, newTaskTitle: title, newTaskContent: content })
+  delete tmpTasks.value[taskId]
+}
+
+const deleteTaskDraft = (task) => {
+  if (task.isDraft()) {
+    emit('deleteTaskDraft', task.id)
+    delete tmpTasks.value[task.id]
+  }
+  if (task.isEditing()) {
+    emit('activateTask', task.id)
+    delete tmpTasks.value[task.id]
+  }
+}
+
+const deleteTask = (taskId) => {
+  const ok = confirm('タスクを削除します。よろしいですか？')
+  if (!ok) return;
+
+  emit('deleteTask', taskId)
+}
+
+const doneTask = (taskId) => {
+  emit('doneTask', taskId)
+}
+
+const returnTaskToActive = (taskId) => {
+  const ok = confirm('タスクを未完了に戻します。よろしいですか？')
+  if (!ok) return;
+
+  emit('returnTaskToActive', taskId)
+}
+
+const toEditing = (task) => {
+  tmpTasks.value[task.id] = { ...tmpTasks.value[task.id], title: task.title, content: task.content }
+  emit('toTaskEditing', task.id)
+}
+
+const inputTitle = (taskId, v) => {
+  tmpTasks.value[taskId] = { ...tmpTasks.value[taskId], title: v }
+}
+
+const inputContent = (taskId, v) => {
+  tmpTasks.value[taskId] = { ...tmpTasks.value[taskId], content: v }
+}
+
+const isDisableCreateButton = (taskId) => {
+  return typeof tmpTasks.value[taskId] === 'undefined'
+    || typeof tmpTasks.value[taskId].title === 'undefined'
+    || typeof tmpTasks.value[taskId].content === 'undefined'
+    || tmpTasks.value[taskId].title === ''
+    || tmpTasks.value[taskId].content === ''
+}
+</script>
+
 <template>
   <h3 class="d-flex justify-content-center">{{ section.name }}</h3>
   <div v-for="task in section.tasks" :key="task.id">
@@ -57,78 +138,6 @@
     <button @click="$emit('createTaskDraft')" class="btn btn-primary">+</button>
   </div>
 </template>
-
-<script>
-import { Section, TaskStatus } from '../../domain/Task'
-
-export default {
-  name: 'TaskSection',
-  props: {
-    section: Section,
-    modelValue: String,
-  },
-  data() {
-    return {
-      tmpTasks: {},
-    }
-  },
-  created() {
-    this.Active = TaskStatus.Active
-    this.Draft = TaskStatus.Draft
-  },
-  emits: ['createTaskDraft', 'deleteTaskDraft', 'completeCreateTask', 'deleteTask', 'doneTask', 'returnTaskToActive', 'toEditing', 'activateTask'],
-  methods: {
-    completeCreateTask(taskId) {
-      const title = this.tmpTasks[taskId].title
-      const content = this.tmpTasks[taskId].content
-      this.$emit('completeCreateTask', { taskId, newTaskTitle: title, newTaskContent: content })
-      delete this.tmpTasks[taskId]
-    },
-    deleteTaskDraft(task) {
-      if (task.isDraft()) {
-        this.$emit('deleteTaskDraft', task.id)
-        delete this.tmpTasks[task.id]
-      }
-      if (task.isEditing()) {
-        this.$emit('activateTask', task.id)
-        delete this.tmpTasks[task.id]
-      }
-    },
-    deleteTask(taskId) {
-      const ok = confirm('タスクを削除します。よろしいですか？')
-      if (!ok) return;
-
-      this.$emit('deleteTask', taskId)
-    },
-    doneTask(taskId) {
-      this.$emit('doneTask', taskId)
-    },
-    returnTaskToActive(taskId) {
-      const ok = confirm('タスクを未完了に戻します。よろしいですか？')
-      if (!ok) return;
-
-      this.$emit('returnTaskToActive', taskId)
-    },
-    toEditing(task) {
-      this.tmpTasks[task.id] = { ...this.tmpTasks[task.id], title: task.title, content: task.content }
-      this.$emit('toTaskEditing', task.id)
-    },
-    inputTitle(taskId, v) {
-      this.tmpTasks[taskId] = { ...this.tmpTasks[taskId], title: v}
-    },
-    inputContent(taskId, v) {
-      this.tmpTasks[taskId] = { ...this.tmpTasks[taskId], content: v }
-    },
-    isDisableCreateButton(taskId) {
-      return typeof this.tmpTasks[taskId] === 'undefined'
-        || typeof this.tmpTasks[taskId].title === 'undefined'
-        || typeof this.tmpTasks[taskId].content === 'undefined'
-        || this.tmpTasks[taskId].title === ''
-        || this.tmpTasks[taskId].content === ''
-    }
-  },
-}
-</script>
 
 <style scoped>
 .success {
