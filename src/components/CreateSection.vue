@@ -1,3 +1,13 @@
+<script setup>
+import { defineProps } from 'vue'
+
+defineProps({
+    isDisabled: Boolean,
+    modelValue: String,
+})
+
+</script>
+
 <template>
   <div class="input-group mb-3 w-50">
     <input type="text" class="form-control" placeholder="create a section"
@@ -11,14 +21,3 @@
     >Create</button>
   </div>
 </template>
-
-<script>
-export default {
-  name: 'CreateSection',
-  props: {
-    isDisabled: Boolean,
-    modelValue: String,
-  },
-  emits: ['update:modelValue'],
-}
-</script>
