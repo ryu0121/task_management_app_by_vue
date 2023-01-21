@@ -21,6 +21,10 @@
   </div>
 </template>
 
+<script setup>
+
+</script>
+
 <script>
 import TaskSections from './components/TaskSections.vue'
 import CreateSection from './components/CreateSection.vue'
