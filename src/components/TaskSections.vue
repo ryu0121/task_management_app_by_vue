@@ -6,7 +6,12 @@
         @onChangeNewTaskTitle="onChangeNewTaskTitle"
         @createTaskDraft="$emit('createTaskDraft', section.id)"
         @completeCreateTask="$emit('completeCreateTask', $event, section.id)"
-        @deleteTaskDraft="$emit('deleteTaskDraft', $event, section.id)" />
+        @deleteTask="$emit('deleteTask', $event, section.id)"
+        @doneTask="$emit('doneTask', $event, section.id)"
+        @deleteTaskDraft="$emit('deleteTaskDraft', $event, section.id)"
+        @returnTaskToActive="$emit('returnTaskToActive', $event, section.id)"
+        @toTaskEditing="$emit('toTaskEditing', $event, section.id)"
+        @activateTask="$emit('activateTask', $event, section.id)" />
     </div>
   </div>
 </template>

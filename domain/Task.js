@@ -40,6 +40,24 @@ export class Sections {
     const task = section.findTaskById(taskId)
     task.activate(payload)
   }
+
+  doneTaskOfSection(taskId, sectionId) {
+    const section = this.findById(sectionId)
+    const task = section.findTaskById(taskId)
+    task.toDone()
+  }
+
+  activateTaskOfSection(taskId, sectionId) {
+    const section = this.findById(sectionId)
+    const task = section.findTaskById(taskId)
+    task.toActivate()
+  }
+
+  taskToEditingOfSection(taskId, sectionId) {
+    const section = this.findById(sectionId)
+    const task = section.findTaskById(taskId)
+    task.toEditing()
+  }
 }
 
 export class Section {
@@ -79,6 +97,8 @@ export class Section {
 export const TaskStatus = {
   Draft: "DRAFT",
   Active: "ACTIVE",
+  Editing: "EDITING",
+  Done: "DONE",
 }
 
 export class Task {
@@ -91,9 +111,37 @@ export class Task {
   }
 
   activate(payload) {
-    this.status = TaskStatus.Active
+    this.toActivate()
     this.title = payload.title
     this.content = payload.content
+  }
+
+  toDone() {
+    this.status = TaskStatus.Done
+  }
+
+  toActivate() {
+    this.status = TaskStatus.Active
+  }
+
+  toEditing() {
+    this.status = TaskStatus.Editing
+  }
+
+  isDraft() {
+    return this.status === TaskStatus.Draft
+  }
+
+  isDone() {
+    return this.status === TaskStatus.Done
+  }
+
+  isActive() {
+    return this.status === TaskStatus.Active
+  }
+
+  isEditing() {
+    return this.status === TaskStatus.Editing
   }
 }
 
