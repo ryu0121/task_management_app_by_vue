@@ -1,9 +1,9 @@
 <script setup>
-import { defineEmits, defineProps, ref } from 'vue'
+import { defineEmits, defineProps, computed, ref } from 'vue'
 
 import { Section } from '../../domain/Task'
 
-defineProps({
+const props = defineProps({
   section: Section,
   displayOptions: Object,
   modelValue: String,
@@ -17,7 +17,8 @@ const emit = defineEmits([
   'doneTask',
   'returnTaskToActive',
   'toTaskEditing',
-  'activateTask'
+  'activateTask',
+  'changeTaskOrderByDrag',
 ])
 
 const tmpTasks = ref({})
@@ -28,6 +29,13 @@ const completeCreateTask = (taskId) => {
   emit('completeCreateTask', { taskId, newTaskTitle: title, newTaskContent: content })
   delete tmpTasks.value[taskId]
 }
+
+const tasks = computed({
+  get: () => props.section.tasks,
+  set: (tasks) => {
+    emit('changeTaskOrderByDrag', tasks)
+  }
+})
 
 const deleteTaskDraft = (task) => {
   if (task.isDraft()) {
@@ -78,66 +86,54 @@ const isDisableCreateButton = (taskId) => {
     || tmpTasks.value[taskId].title === ''
     || tmpTasks.value[taskId].content === ''
 }
+
 </script>
 
 <template>
-  <h3 class="d-flex justify-content-center">{{ section.name }}</h3>
-  <div v-for="task in section.tasks" :key="task.id">
-    <div class="card m-2" style="width: 18rem;">
-      <div v-if="task.isActive()" class="d-flex justify-content-end m-2">
-        <font-awesome-icon
-          @click="toEditing(task)"
-          icon="fa-solid fa-pen-to-square"
-          class="button-hover secondary" />
-      </div>
-      <div v-if="task.isActive() || task.isDone()" class="card-body">
-        <h5 class="card-title pt-2">{{ task.title }}</h5>
-        <p class="card-text mt-2">{{ task.content }}</p>
-        <div class="d-flex justify-content-between">
-          <div class="d-flex justify-content-end">
-            <font-awesome-icon v-if="task.isActive()"
-              @click="doneTask(task.id)"
-              icon="fa-regular fa-circle-check"
-              class="me-1 success button-hover" />
-            <font-awesome-icon v-else-if="task.isDone()"
-              icon="fa-solid fa-circle-check"
-              class="me-1 success" />
-            <font-awesome-icon @click="deleteTask(task.id)"
-              icon="fa-regular fa-circle-xmark"
-              class="failure button-hover" />
+    <h3 class="d-flex justify-content-center">{{ section.name }}</h3>
+    <draggable v-model="tasks" item-key="id" group="task" :options="{ group: 'task', animation: 150 }" handle='.handle'  >
+      <template #item="{element}">
+        <div class="card m-2" style="width: 18rem;">
+          <div class="handle">::::::::::::::::</div>
+          <div v-if="element.isActive()" class="d-flex justify-content-end m-2">
+            <font-awesome-icon @click="toEditing(element)" icon="fa-solid fa-pen-to-square" class="button-hover secondary" />
           </div>
-          <font-awesome-icon v-if="task.isDone()"
-            @click="returnTaskToActive(task.id)"
-            icon="ffa-solid fa-arrow-rotate-left"
-            class="me-1 secondary button-hover" />
-        </div>
-      </div>
-      <div v-else-if="task.isDraft() || task.isEditing()" class="card-body">
-        <input class="card-title pt-2" placeholder="タイトル"
-          @input="inputTitle(task.id, $event.target.value)"
-          :value="typeof tmpTasks[task.id] === 'undefined'
-          ? '' : tmpTasks[task.id].title" />
-        <textarea class="card-text mt-2" placeholder="内容"
-          @input="inputContent(task.id, $event.target.value)"
-          :value="typeof tmpTasks[task.id] === 'undefined'
-          ? '' : tmpTasks[task.id].content" ></textarea>
-        <div class="mt-3 d-flex justify-content-center">
-          <div class="me-3">
-            <button
-              @click="completeCreateTask(task.id)"
-              :disabled="isDisableCreateButton(task.id)"
-              class="px-2 btn btn-primary">作成</button>
+          <div v-if="element.isActive() || element.isDone()" class="card-body">
+            <h5 class="card-title pt-2">{{ element.title }}</h5>
+            <p class="card-text mt-2">{{ element.content }}</p>
+            <div class="d-flex justify-content-between">
+              <div class="d-flex justify-content-end">
+                <font-awesome-icon v-if="element.isActive()" @click="doneTask(element.id)" icon="fa-regular fa-circle-check"
+                  class="me-1 success button-hover" />
+                <font-awesome-icon v-else-if="element.isDone()" icon="fa-solid fa-circle-check" class="me-1 success" />
+                <font-awesome-icon @click="deleteTask(element.id)" icon="fa-regular fa-circle-xmark"
+                  class="failure button-hover" />
+              </div>
+              <font-awesome-icon v-if="element.isDone()" @click="returnTaskToActive(element.id)" icon="ffa-solid fa-arrow-rotate-left"
+                class="me-1 secondary button-hover" />
+            </div>
           </div>
-          <div class="ml-3">
-            <button @click="deleteTaskDraft(task)" class="px-2 btn btn-secondary">キャンセル</button>
+          <div v-else-if="element.isDraft() || element.isEditing()" class="card-body">
+            <input class="card-title pt-2" placeholder="タイトル" @input="inputTitle(element.id, $event.target.value)" :value="typeof tmpTasks[element.id] === 'undefined'
+            ? '' : tmpTasks[element.id].title" />
+            <textarea class="card-text mt-2" placeholder="内容" @input="inputContent(element.id, $event.target.value)" :value="typeof tmpTasks[element.id] === 'undefined'
+            ? '' : tmpTasks[element.id].content"></textarea>
+            <div class="mt-3 d-flex justify-content-center">
+              <div class="me-3">
+                <button @click="completeCreateTask(element.id)" :disabled="isDisableCreateButton(element.id)"
+                  class="px-2 btn btn-primary">作成</button>
+              </div>
+              <div class="ml-3">
+                <button @click="deleteTaskDraft(element)" class="px-2 btn btn-secondary">キャンセル</button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </template>
+    </draggable>
+    <div v-if="displayOptions.displayAll">
+      <button @click="$emit('createTaskDraft')" class="btn btn-primary">+</button>
     </div>
-  </div>
-  <div v-if="displayOptions.displayAll">
-    <button @click="$emit('createTaskDraft')" class="btn btn-primary">+</button>
-  </div>
 </template>
 
 <style scoped>
@@ -152,5 +148,9 @@ const isDisableCreateButton = (taskId) => {
 .button-hover:hover {
   opacity: 0.6;
   cursor: pointer;
+}
+
+.handle:hover {
+  cursor: grab;
 }
 </style>

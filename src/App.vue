@@ -165,6 +165,16 @@ const onClickDisplayButton = (option) => {
     }
   })
 }
+const changeTaskOrderByDrag = (tasks, sectionId) => {
+  const sectionsCopy = sections.value.copy()
+  for (const section of sections.value.items) {
+    if (section.id === sectionId) {
+      const section = sectionsCopy.findById(sectionId)
+      section.tasks = tasks
+    }
+  }
+  sections.value = sectionsCopy
+}
 </script>
 
 <template>
@@ -190,7 +200,8 @@ const onClickDisplayButton = (option) => {
       @createTaskDraft="createTaskDraft"
       @completeCreateTask="completeCreateTask" @deleteTask="deleteTask" @doneTask="doneTask"
       @deleteTaskDraft="deleteTaskDraft" @returnTaskToActive="returnTaskToActive" @toTaskEditing="toTaskEditing"
-      @activateTask="activateTask" />
+      @activateTask="activateTask"
+      @changeTaskOrderByDrag="changeTaskOrderByDrag" />
   </div>
 </template>
 

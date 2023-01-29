@@ -8,6 +8,7 @@ defineProps({
   sections: Sections,
   displayOptions: Object
 })
+// NOTE ここにコメントを入れないとハイライトがおかしくなる
 </script>
 
 <template>
@@ -23,7 +24,8 @@ defineProps({
         @deleteTaskDraft="$emit('deleteTaskDraft', $event, section.id)"
         @returnTaskToActive="$emit('returnTaskToActive', $event, section.id)"
         @toTaskEditing="$emit('toTaskEditing', $event, section.id)"
-        @activateTask="$emit('activateTask', $event, section.id)" />
+        @activateTask="$emit('activateTask', $event, section.id)"
+        @changeTaskOrderByDrag="$emit('changeTaskOrderByDrag', $event, section.id)" />
     </div>
   </div>
 </template>

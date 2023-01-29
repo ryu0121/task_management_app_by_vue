@@ -1,6 +1,7 @@
 /* Set up using Vue 3 */
 import { createApp } from 'vue'
 import App from './App.vue'
+import Draggable from 'vuedraggable'
 import './assets/css/styles.css'
 
 /* import the fontawesome core */
@@ -21,5 +22,6 @@ library.add(
   faPenToSquare)
 
 createApp(App)
-.component('font-awesome-icon', FontAwesomeIcon)
+  .component('font-awesome-icon', FontAwesomeIcon)
+  .component('Draggable', Draggable)
 .mount('#app')
