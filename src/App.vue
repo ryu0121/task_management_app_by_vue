@@ -40,29 +40,34 @@ const displayedSections = computed(() => {
 
   const filtered = sections.value.copy()
 
-  // 削除予定のsection
-  const deleteSectionMemo = []
-  for (const section of filtered.items) {
-    // 削除予定のtask
-    const deleteTaskMemo = []
-    for (const task of section.tasks) {
-      if (task.isDone() || task.isDraft() || task.isEditing()) {
-        deleteTaskMemo.push({ taskId: task.id, sectionId: section.id })
+  if (displayOptions.value['displayOnlyActive']) {
+    // 削除予定のsection
+    const deleteSectionMemo = []
+    for (const section of filtered.items) {
+      // 削除予定のtask
+      const deleteTaskMemo = []
+      for (const task of section.tasks) {
+        if (task.isDone() || task.isDraft() || task.isEditing()) {
+          deleteTaskMemo.push({ taskId: task.id, sectionId: section.id })
+          console.log(deleteTaskMemo)
+        }
+      }
+      if (deleteTaskMemo.length === section.tasks.length) {
+        deleteSectionMemo.push(section.id)
+      }
+
+      // 削除予定のtaskを削除
+      for (const memo of deleteTaskMemo) {
+        filtered.deleteTaskFromSection(memo.taskId, memo.sectionId)
       }
     }
-    if (deleteTaskMemo.length === section.tasks.length) {
-      deleteSectionMemo.push(section.id)
+
+    // 削除予定のsectionを削除
+    for (const memo of deleteSectionMemo) {
+      filtered.deleteSection(memo.sectionId)
     }
 
-    // 削除予定のtaskを削除
-    for (const memo of deleteTaskMemo) {
-      filtered.deleteTaskFromSection(memo.taskId, memo.sectionId)
-    }
-  }
-
-  // 削除予定のsectionを削除
-  for (const memo of deleteSectionMemo) {
-    filtered.deleteSection(memo.sectionId)
+    console.log(filtered)
   }
 
   if (displayOptions.value['displayOnlyDone']) {
@@ -94,7 +99,7 @@ const displayedSections = computed(() => {
     return filtered
   }
 
-  return sections.value
+  return filtered
 })
 const includeDraft = computed(() => {
   for (const section of sections.value.items) {
